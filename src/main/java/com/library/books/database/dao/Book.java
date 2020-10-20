@@ -13,8 +13,8 @@ public class Book {
     Long id;
     @Column(name = "name")
     String name;
-    @Column(name = "authorID")
-    Long authorID;
+    @ManyToOne
+    Author author;
     @Column(name = "year")
     int year;
 
@@ -34,14 +34,6 @@ public class Book {
         this.name = name;
     }
 
-    public Long getAuthorID() {
-        return authorID;
-    }
-
-    public void setAuthorID(Long authorID) {
-        this.authorID = authorID;
-    }
-
     public Integer getYear() {
         return year;
     }
@@ -56,5 +48,13 @@ public class Book {
 
     public void setCategories(List<Category> categories) {
         this.categories = categories;
+    }
+
+    public Author getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(Author author) {
+        this.author = author;
     }
 }
