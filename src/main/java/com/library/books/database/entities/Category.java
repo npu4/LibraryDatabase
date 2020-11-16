@@ -1,4 +1,4 @@
-package com.library.books.database.dao;
+package com.library.books.database.entities;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ public class Category {
     @Column
     String name;
 
-    @ManyToMany(mappedBy = "categories", fetch = FetchType.EAGER)
+    @ManyToMany(mappedBy = "categories", fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     List<Book> books = new ArrayList<>();
 
     public String getName() {

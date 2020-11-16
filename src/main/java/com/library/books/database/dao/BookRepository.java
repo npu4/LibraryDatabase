@@ -1,5 +1,6 @@
 package com.library.books.database.dao;
 
+import com.library.books.database.entities.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

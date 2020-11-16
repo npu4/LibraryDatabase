@@ -1,6 +1,9 @@
 package com.library.books.database.services;
 
 import com.library.books.database.dao.*;
+import com.library.books.database.entities.Author;
+import com.library.books.database.entities.Book;
+import com.library.books.database.entities.Category;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -22,11 +25,11 @@ public class LibraryService {
     @Transactional
     @PostConstruct
     void init() {
-        //defaultFull();
+        defaultFull();
 
         Long authorID = (long) new Random().nextInt(authorRepository.findAll().size()) + 1;
         if(authorRepository.findById(authorID).isPresent()){
-            System.out.println("Книги автора " + authorRepository.findById(authorID).get().getFullName() + ":");
+            System.out.println("\n\nКниги автора " + authorRepository.findById(authorID).get().getFullName() + ":");
             List<Book> booksByAuthor = getBooksByAuthor(authorRepository.findById(authorID).get().getFullName());
             for (Book book : booksByAuthor) {
                 System.out.println(book.getName());
@@ -37,26 +40,22 @@ public class LibraryService {
         Integer categoryID = new Random().nextInt(categoryRepository.findAll().size()) + 1;
         if(categoryRepository.findById(categoryID).isPresent()){
             String categoryName = categoryRepository.findById(categoryID).get().getName();
-            System.out.println("Все книги из категории " + categoryName + ":");
+            System.out.println("\n\nВсе книги из категории " + categoryName + ":");
             List<Book> booksByCategory = getBooksByCategory(categoryName);
             for (Book book : booksByCategory) {
                 System.out.println(book.getName());
             }
 
-            System.out.println("Авторы с книгой из категории " + categoryName + ":");
+
+            System.out.println("\n\nАвторы с книгой из категории " + categoryName + ":");
             List<Author> authorsWithBookInCategory = getAuthorsWithBookInCategory(categoryName);
             for (Author aut : authorsWithBookInCategory) {
                 System.out.println(aut.getFullName());
             }
         }
 
-        System.out.println("Авторы без книг:");
-        List<Author> authorsWithoutBooks = getAuthorsWithoutBooks();
-        for (Author aut : authorsWithoutBooks) {
-            System.out.println(aut.getFullName());
-        }
 
-        System.out.println("Авторы со словом \"ло\" в названии книги:");
+        System.out.println("\n\nАвторы со словом \"ло\" в названии книги:");
         List<Author> authorsWithWordInBook = getAuthorsWithWordInBook("ло");
         for (Author aut : authorsWithWordInBook) {
             System.out.println(aut.getFullName());
@@ -96,51 +95,45 @@ public class LibraryService {
     }
 
     void defaultFull() {
-        String[] authorNames = {
-                "Дюма Александр",
-                "Дойл Адриан Конан",
-                "Лермонтов Михаил Юрьевич",
-                "Беляев Александр Романович"
-        };
-        for (String authorName : authorNames) {
-            Author author = new Author();
-            author.setFullName(authorName);
-            authorRepository.save(author);
-        }
+        Author author1 = new Author();
+        author1.setFullName("Дюма Александр");
+        Collection<String[]> books1 = new ArrayList<>();
+        books1.add(new String[]{"Королева Марго", "1995", "исторический роман"});
+        books1.add(new String[]{"Три мушкетера", "1987", "роман-фельетон", "роман плаща и шпаги"});
+        books1.add(new String[]{"Граф Монте-Кристо", "1999", "исторический роман", "приключенческий роман"});
+        addBooks(author1, books1);
+        authorRepository.save(author1);
 
-        String[] categoryNames = {
-                "исторический роман",
-                "роман-фельетон",
-                "роман плаща и шпаги",
-                "криминальный рассказ",
-                "детектив",
-                "приключенческий роман",
-                "научная фантастика"
-        };
-        for (String categoryName : categoryNames) {
-            Category category = new Category();
-            category.setName(categoryName);
-            categoryRepository.save(category);
-        }
+        Author author2 = new Author();
+        author2.setFullName("Беляев Александр Романович");
+        Collection<String[]> books2 = new ArrayList<>();
+        books2.add(new String[]{"Человек-амфибия", "2015", "научная фантастика"});
+        books2.add(new String[]{"Голова профессора Доуэля", "2010", "научная фантастика"});
+        addBooks(author2, books2);
+        authorRepository.save(author2);
+    }
 
-        Collection<String[]> books = new ArrayList<>();
-        books.add(new String[]{"Королева Марго", "1995", "Дюма Александр", "исторический роман"});
-        books.add(new String[]{"Три мушкетера", "1987", "Дюма Александр", "роман-фельетон", "роман плаща и шпаги"});
-        books.add(new String[]{"Приключения Шерлока Холмса", "2005", "Дойл Адриан Конан", "криминальный рассказ", "детектив"});
-        books.add(new String[]{"Граф Монте-Кристо", "1999", "Дюма Александр", "исторический роман", "приключенческий роман"});
-        books.add(new String[]{"Голова профессора Доуэля", "2010", "Беляев Александр Романович", "научная фантастика"});
-        books.add(new String[]{"Человек-амфибия", "2015", "Беляев Александр Романович", "научная фантастика"});
+    void addBooks(Author author, Collection<String[]> books){
+        Collection<Book> authorBooks = new ArrayList<>();
         for (String[] book : books) {
             Book newBook = new Book();
             newBook.setName(book[0]);
             newBook.setYear(Integer.parseInt(book[1]));
-            newBook.setAuthor(authorRepository.getAuthorByFullName(book[2]));
             List<Category> categories = new ArrayList<>();
-            for (int i = 3; i < book.length; i++) {
-                categories.add(categoryRepository.getCategoryByName(book[i]));
+            for (int i = 2; i < book.length; i++) {
+                Category category = new Category();
+                if (categoryRepository.getCategoryByName(book[i]) == null) {
+                    category.setName(book[i]);
+                }
+                else {
+                    category = categoryRepository.getCategoryByName(book[i]);
+                }
+                categories.add(category);
             }
             newBook.setCategories(categories);
-            bookRepository.save(newBook);
+            newBook.setAuthor(author);
+            authorBooks.add(newBook);
+            author.setBook(authorBooks);
         }
     }
 }

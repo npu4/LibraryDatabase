@@ -1,9 +1,9 @@
-package com.library.books.database.dao;
+package com.library.books.database.entities;
 
 import javax.persistence.*;
 import java.util.Collection;
 
-@Entity
+@Entity(name = "Author")
 @Table(name = "Author")
 public class Author {
     @Id
@@ -11,6 +11,8 @@ public class Author {
     Long id;
     @Column
     String fullName;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
+    Collection<Book> book;
 
     public Long getId() {
         return id;
@@ -23,9 +25,6 @@ public class Author {
     public void setFullName(String fullName) {
         this.fullName = fullName;
     }
-
-    @OneToMany(mappedBy = "author")
-    private Collection<Book> book;
 
     public Collection<Book> getBook() {
         return book;

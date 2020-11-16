@@ -1,4 +1,4 @@
-package com.library.books.database.dao;
+package com.library.books.database.entities;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -13,17 +13,11 @@ public class Book {
     Long id;
     @Column(name = "name")
     String name;
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     Author author;
     @Column(name = "year")
     int year;
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "BookAndCategory",
-            joinColumns = @JoinColumn(name = "id_Book", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "id_Category", referencedColumnName = "id")
-    )
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     List<Category> categories = new ArrayList<>();
 
     public String getName() {
